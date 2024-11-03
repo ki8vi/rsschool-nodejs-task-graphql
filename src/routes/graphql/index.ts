@@ -23,7 +23,7 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
       const { query, variables } = req.body;
       const errors = validate( schema, parse(query));
       if(errors.length) return { errors };
-      else console.log('all good bro!')
+      else console.log('all good')
       return await graphql({ schema, source: query, variableValues: variables, contextValue: { prisma } });
 
     },

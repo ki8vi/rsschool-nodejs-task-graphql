@@ -10,11 +10,12 @@ export interface UserType {
   id: string;
   name: string;
   balance: number;
-  profile: typeof ProfileType | null;
+  profile: typeof ProfileType;
   posts: typeof Post[];
   userSubscribedTo: UserType[];
   subscribedToUser: UserType[];
 }
+
 
 export const User = new GraphQLObjectType<UserType, { prisma: PrismaClient }>({
     name: 'User',
@@ -29,13 +30,13 @@ export const User = new GraphQLObjectType<UserType, { prisma: PrismaClient }>({
             },
         },
         posts: {
-            type: new GraphQLList(Post),
+            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Post))),
             resolve: async (parent, __, { prisma }) => {
                 return prisma.post.findMany({ where: { authorId: parent.id } });
             },
         },
         userSubscribedTo: {
-            type: new GraphQLList(User),
+            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(User))),
             resolve: async (parent, __, { prisma }) => {
                 const sbs = await prisma.subscribersOnAuthors.findMany({
                     where: { subscriberId: parent.id },
@@ -45,7 +46,7 @@ export const User = new GraphQLObjectType<UserType, { prisma: PrismaClient }>({
             },
         },
         subscribedToUser: {
-            type: new GraphQLList(User),
+            type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(User))),
             resolve: async (parent, __, { prisma }) => {
                 const sbs = await prisma.subscribersOnAuthors.findMany({
                     where: { authorId: parent.id },
